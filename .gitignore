@@ -1,0 +1,7 @@
+bin
+todo.txt
+venv
+*.sh
+config.json
+gpt-api-prompt.txt
+logfile.log
