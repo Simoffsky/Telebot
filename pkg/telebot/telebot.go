@@ -83,8 +83,8 @@ func (t *Telebot) ReplyTo(message Message, text string) {
 	panic("not implemented")
 }
 
-func (t *Telebot) EditMessage(message Message, updatedText string) error {
-	panic("not implemented")
+func (t *Telebot) EditMessage(message Message, updatedText string) Message {
+	return t.apiClient.EditMessage(message, updatedText)
 }
 
 func (t *Telebot) HandleMessage(commandFunc func(Message), command string) {

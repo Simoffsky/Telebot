@@ -63,14 +63,43 @@ func (tc *TelegramClient) SendMessage(chatId int64, text string) Message {
 	jsonPayload, err := json.Marshal(Payload)
 	checkDie(err)
 
-	req, err := http.NewRequest("POST", tc.apiUrl+"/sendMessage", bytes.NewBuffer(jsonPayload))
+	resp := tc.makePostRequest(jsonPayload, "/sendMessage")
+	message := tc.parseMessageResponse(resp)
+
+	return message
+}
+
+func (tc *TelegramClient) EditMessage(message Message, editedText string) Message {
+	Payload := struct {
+		ChatId    int64  `json:"chat_id"`
+		MessageId int64  `json:"message_id"`
+		Text      string `json:"text"`
+	}{
+		message.Chat.Id,
+		message.MessageId,
+		editedText,
+	}
+
+	jsonPayload, err := json.Marshal(Payload)
+	checkDie(err)
+	resp := tc.makePostRequest(jsonPayload, "/editMessageText")
+	editedMessage := tc.parseMessageResponse(resp)
+
+	return editedMessage
+}
+
+func (tc *TelegramClient) makePostRequest(jsonPayload []byte, endpoint string) *http.Response {
+	req, err := http.NewRequest("POST", tc.apiUrl+endpoint, bytes.NewBuffer(jsonPayload))
 	checkDie(err)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	checkDie(err)
+	return resp
+}
 
+func (tc *TelegramClient) parseMessageResponse(resp *http.Response) Message {
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		log.Fatal(err.Error() + "; " + string(respBody))
@@ -81,5 +110,8 @@ func (tc *TelegramClient) SendMessage(chatId int64, text string) Message {
 	}{}
 	err = json.Unmarshal(respBody, &message)
 	checkDie(err)
+	if !message.Ok {
+		log.Fatal("Messed up, parseMessageResponse bad response")
+	}
 	return message.Result
 }

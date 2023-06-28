@@ -25,21 +25,21 @@ func commandGPT(bot *telebot.Telebot, gpt *gpt.GptApiClient) func(telebot.Messag
 		text := message.From.Username + ": " + message.Text[4:]
 		makeLog(text) //TODO: Вынести куда-то отсюда
 
-		//botMessage := bot.SendMessage(message.Chat.Id, "...")
+		botMessage := bot.SendMessage(message.Chat.Id, "...")
 
 		ans, err := gpt.SendMessage(text)
-
+		println(ans)
 		if err != nil {
 			bot.SendMessage(message.Chat.Id, "Ошибка: "+err.Error())
 			return
 		}
 
-		telegramAns := bot.SendMessage(message.Chat.Id, ans)
+		botMessage = bot.EditMessage(botMessage, ans)
 
-		if telegramAns.Text[0:4] == "/gpt" {
+		if len(botMessage.Text) >= 4 && botMessage.Text[0:4] == "/gpt" {
 			time.Sleep(10 * time.Second)
-			telegramAns.From.Username = "VladOS"
-			commandGPT(bot, gpt)(telegramAns)
+			botMessage.From.Username = "VladOS"
+			commandGPT(bot, gpt)(botMessage)
 		}
 	}
 }
