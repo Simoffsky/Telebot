@@ -17,6 +17,7 @@ type Message struct {
 	Entities  []MessageEntity `json:"entities,omitempty"`
 }
 
+
 type MessageEntity struct {
 	Type string `json:"type"`
 	User User   `json:"user,omitempty"` // for type "text_mention"

@@ -22,14 +22,13 @@ func commandStart(bot *telebot.Telebot) func(telebot.Message) {
 
 func commandGPT(bot *telebot.Telebot, gpt *gpt.GptApiClient) func(telebot.Message) {
 	return func(message telebot.Message) {
-		// if message.From.Id == telebot.DANILA_ID {
-		// 	bot.SendMessage(message.Chat.Id, "Доступ запрещён")
-		// 	return
-		// }
-
 		text := message.From.Username + ": " + message.Text[4:]
 		makeLog(text) //TODO: Вынести куда-то отсюда
+
+		//botMessage := bot.SendMessage(message.Chat.Id, "...")
+
 		ans, err := gpt.SendMessage(text)
+
 		if err != nil {
 			bot.SendMessage(message.Chat.Id, "Ошибка: "+err.Error())
 			return
