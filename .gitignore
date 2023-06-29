@@ -3,5 +3,7 @@ todo.txt
 venv
 *.sh
 config.json
+weather.json
 gpt-api-prompt.txt
 logfile.log
+.DS_Store
