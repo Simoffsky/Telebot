@@ -18,7 +18,6 @@ def get_weather_html():
 
     return html_content
 
-
 def save_tuple_to_json(tuple):
     dict = {'status': tuple[0], 'message': tuple[1]}
     
@@ -31,11 +30,11 @@ def get_test_html():
         html_content = f.read()
     return html_content
 
-
 def get_tuple_from_json():
     with open('weather.json', 'r', encoding='utf-8') as f:
         dict = json.load(f)
     return (dict['status'], dict['message'])
+
 def main():
     html_content = get_weather_html()
     #html_content = get_test_html() #FIXME: for test only

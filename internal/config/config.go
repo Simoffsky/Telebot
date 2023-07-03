@@ -12,6 +12,8 @@ type Config struct {
 	GPTPrompt         string `json:"-"`
 	GPTStoredMessages int    `json:"gpt_stored_messages"`
 	GPTToken          string `json:"gpt_token"`
+
+	WeatherPath string `json:"weather_json_path"`
 }
 
 func NewConfig(configPath, gptPromptPath string) (*Config, error) {

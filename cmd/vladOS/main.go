@@ -19,7 +19,6 @@ func init() {
 
 func main() {
 	config := parseConfig()
-
 	bot := bot.NewBot(config)
 	bot.Start()
 }

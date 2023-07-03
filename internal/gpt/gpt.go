@@ -34,7 +34,28 @@ func NewGptApiClient(gptKey string, gptInitPrompt string, countStoredMessages in
 }
 
 // returns answer from GPT-3.5-turbo
-func (gpt *GptApiClient) SendMessage(message string) (string, error) {
+func (gpt *GptApiClient) SendMessage(messageText string) (string, error) {
+
+	message := Message{"user", messageText}
+
+	requestData := NewRequest([]Message{message})
+
+	jsonPayload, err := json.Marshal(requestData)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	resp, err := gpt.makeRequest(jsonPayload)
+	if err != nil {
+		return "", err
+	}
+
+	answer := resp.Choices[0].Message.Content
+	gpt.addMessage("VladOS: " + answer)
+	return answer, nil
+}
+
+func (gpt *GptApiClient) SendGroupMessage(message string) (string, error) {
 	gpt.addMessage(message)
 
 	requestData := NewRequest(gpt.messages)
@@ -52,7 +73,6 @@ func (gpt *GptApiClient) SendMessage(message string) (string, error) {
 	answer := resp.Choices[0].Message.Content
 	gpt.addMessage("VladOS: " + answer)
 	return answer, nil
-
 }
 
 func (client *GptApiClient) addMessage(messageString string) {

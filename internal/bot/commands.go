@@ -12,6 +12,8 @@ import (
 func (bot *Bot) RegisterCommands() {
 	bot.telebot.HandleMessage(commandStart(bot.telebot), "start")
 	bot.telebot.HandleMessage(commandGPT(bot.telebot, bot.gptClient), "gpt")
+
+	go bot.weatherForecastWatcher()
 }
 
 func commandStart(bot *telebot.Telebot) func(telebot.Message) {
@@ -27,7 +29,7 @@ func commandGPT(bot *telebot.Telebot, gpt *gpt.GptApiClient) func(telebot.Messag
 
 		botMessage := bot.SendMessage(message.Chat.Id, "...")
 
-		ans, err := gpt.SendMessage(text)
+		ans, err := gpt.SendGroupMessage(text)
 		println(ans)
 		if err != nil {
 			bot.SendMessage(message.Chat.Id, "Ошибка: "+err.Error())

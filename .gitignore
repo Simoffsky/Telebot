@@ -7,3 +7,5 @@ weather.json
 gpt-api-prompt.txt
 logfile.log
 .DS_Store
+__pycache__
+geckodriver.log
