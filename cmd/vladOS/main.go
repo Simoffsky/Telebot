@@ -20,7 +20,8 @@ func init() {
 func main() {
 	config := parseConfig()
 	bot := bot.NewBot(config)
-	bot.Start()
+	err := bot.Start()
+	log.Fatal(err)
 }
 
 func parseConfig() *config.Config {

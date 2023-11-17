@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import requests
 
-
 def get_formatted_message(html):
     try: 
         message = 'Погода во Владивостоке: \n'
@@ -9,7 +8,6 @@ def get_formatted_message(html):
         if not check_valid(soup): #FIXME:
             return (False, "Не удалось распарсить сайт с погодой :(. Надо чинить парсер")
         
-
         message += soup.find('div', class_='link__condition day-anchor i-bem').text + '\n'
         
         time = soup.find('time', class_='time fact__time').text

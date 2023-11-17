@@ -3,6 +3,7 @@ package telebot
 import (
 	"log"
 	"strings"
+	"sync"
 )
 
 func checkDie(err error) {
@@ -15,6 +16,7 @@ type Telebot struct {
 	apiClient       *TelegramClient
 	commandHandlers map[string]func(Message) // calls if command is found
 	commonHandlers  []func(Message)
+	mx              sync.Mutex
 }
 
 func NewTelebot(apiKey string) *Telebot {
@@ -39,7 +41,7 @@ func (t *Telebot) LongPolling() error {
 
 func (t *Telebot) handleUpdates(updates []Update) {
 	for _, update := range updates {
-		t.handleUpdate(update)
+		go t.handleUpdate(update)
 	}
 }
 
@@ -52,28 +54,32 @@ func (t *Telebot) handleUpdate(update Update) {
 		}
 	}
 
+	t.mx.Lock()
 	for _, commonHandler := range t.commonHandlers {
 		commonHandler(update.Message)
 	}
-
+	t.mx.Unlock()
 }
 
 // can handle message that starts with '/'
 func (t *Telebot) handleCommand(message Message) {
 	command := strings.Split(message.Text, " ")[0][1:]
+	t.mx.Lock()
 	_, ok := t.commandHandlers[command]
 	if !ok {
 		log.Println("unknown command: " + command)
+		t.mx.Unlock()
 		return
 	}
 
 	t.commandHandlers[command](message)
+	t.mx.Unlock()
 }
 
 // send string message to chat with chatId
 // TODO: change chatId to chat and text to message
 // Maybe not? I don't know
-// Returns telegamm sended message
+// Returns telegam sended message
 func (t *Telebot) SendMessage(chatId int64, text string) Message {
 	return t.apiClient.SendMessage(chatId, text)
 }

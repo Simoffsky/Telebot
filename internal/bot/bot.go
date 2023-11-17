@@ -1,7 +1,6 @@
 package bot
 
 import (
-	"log"
 	"vladOS/internal/config"
 	"vladOS/internal/gpt"
 	"vladOS/internal/opendota"
@@ -26,11 +25,8 @@ func NewBot(config *config.Config) *Bot {
 	}
 }
 
-func (bot *Bot) Start() {
+func (bot *Bot) Start() error {
 	bot.RegisterCommands()
 	go opendota.CheckPlayedMatch(bot.telebot, bot.config.TelegramGroupId)
-	err := bot.telebot.LongPolling()
-	if err != nil {
-		log.Fatal(err) // FIXME:
-	}
+	return bot.telebot.LongPolling()
 }

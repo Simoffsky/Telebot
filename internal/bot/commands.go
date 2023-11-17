@@ -3,6 +3,7 @@ package bot
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
 	"time"
 	"vladOS/internal/gpt"
@@ -12,7 +13,7 @@ import (
 func (bot *Bot) RegisterCommands() {
 	bot.telebot.HandleMessage(commandStart(bot.telebot), "start")
 	bot.telebot.HandleMessage(commandGPT(bot.telebot, bot.gptClient), "gpt")
-
+	bot.telebot.HandleMessage(randomAnsGPT(bot.telebot, bot.gptClient), "")
 	go bot.weatherForecastWatcher()
 }
 
@@ -22,15 +23,23 @@ func commandStart(bot *telebot.Telebot) func(telebot.Message) {
 	}
 }
 
+func randomAnsGPT(bot *telebot.Telebot, gpt *gpt.GptApiClient) func(telebot.Message) {
+	return func(message telebot.Message) {
+		r := rand.New(rand.NewSource(time.Now().UnixNano()))
+		if r.Int()%100 > 90 {
+			commandGPT(bot, gpt)(message)
+		}
+	}
+}
 func commandGPT(bot *telebot.Telebot, gpt *gpt.GptApiClient) func(telebot.Message) {
 	return func(message telebot.Message) {
 		text := message.From.Username + ": " + message.Text[4:]
-		makeLog(text) //TODO: Вынести куда-то отсюда
+		logMessage(text)
 
 		botMessage := bot.SendMessage(message.Chat.Id, "...")
 
 		ans, err := gpt.SendGroupMessage(text)
-		println(ans)
+
 		if err != nil {
 			bot.SendMessage(message.Chat.Id, "Ошибка: "+err.Error())
 			return
@@ -46,7 +55,7 @@ func commandGPT(bot *telebot.Telebot, gpt *gpt.GptApiClient) func(telebot.Messag
 	}
 }
 
-func makeLog(text string) {
+func logMessage(text string) {
 	file, err := os.OpenFile("logfile.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)

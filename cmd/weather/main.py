@@ -3,8 +3,9 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from parsing import *
-import json
+import json, sys
 
+json_path = ''
 def get_weather_html():
     options = Options()
 
@@ -39,6 +40,7 @@ def main():
     html_content = get_weather_html()
     #html_content = get_test_html() #FIXME: for test only
     weather_tuple = get_formatted_message(html_content)
+    save_tuple_to_json(weather_tuple)
 
 if __name__ == '__main__':
     main()
